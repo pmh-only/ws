@@ -13,6 +13,25 @@ fi
 CONFIG_DATA=$(jq -c . "$CONFIG_PATH")
 
 case $1 in
+  a)
+    if [ $# -ne 2 ]; then
+      echo "Usage: ws a <workspace_name>"
+      return
+    fi
+
+    WORKSPACE_NAME=$2
+    WORKSPACE_PATH=$PWD
+    WORKSPACE_EXISTS=$(echo $CONFIG_DATA | jq -r ".spaces[] | select(.name == \"$WORKSPACE_NAME\") | .path")
+
+    if [ "$WORKSPACE_EXISTS" != "" ]; then
+      echo "Workspace \"$WORKSPACE_NAME\" is already exists. exit."
+      return
+    fi
+
+    echo $CONFIG_DATA | jq ".spaces += [{\"name\":\"$WORKSPACE_NAME\",\"path\":\"$WORKSPACE_PATH\"}]" > $CONFIG_PATH
+    echo "Workspace added. \"$WORKSPACE_NAME\" ~> \"$WORKSPACE_PATH\""
+   ;;
+
   c)
     if !command -v git &> /dev/null; then
       echo "Cannot found requirement: \"git\". exit."
@@ -43,7 +62,7 @@ case $1 in
 
   "")
     echo "Usage: ws c <git_remote_url>"
-    echo "Usage: ws d [workspace_name]"
+    echo "Usage: ws a <workspace_name>"
     echo "Usage: ws [workspace_name]"
     ;;
 
