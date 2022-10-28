@@ -38,7 +38,7 @@ case $1 in
     fi
 
     if [ $# -ne 2 ]; then
-      echo "Usage: ws c <workspace_name> <git_remote_url>"
+      echo "Usage: ws c <git_remote_url> [workspace_name]"
       return
     fi
     
@@ -46,6 +46,10 @@ case $1 in
     WORKSPACE_PATH=$(cut -d. -f1 <<< $WORKSPACE_PATH)
     WORKSPACE_NAME=$(cut -d/ -f2 <<< $WORKSPACE_PATH)
     WORKSPACE_PATH="$(echo $CONFIG_DATA | jq -r ".base")/$WORKSPACE_PATH"
+
+    if [ "$3" != "" ]; then
+      WORKSPACE_NAME=$3
+    fi
 
     WORKSPACE_EXISTS=$(echo $CONFIG_DATA | jq -r ".spaces[] | select(.name == \"$WORKSPACE_NAME\") | .path")
     if [ "$WORKSPACE_EXISTS" != "" ]; then
