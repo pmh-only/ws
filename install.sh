@@ -8,11 +8,12 @@ if command -v ws > /dev/null; then
   rm "$(which ws)"
 fi
 
-install_uri="https://raw.github.com/pmh-only/ws/main/install.sh"
+install_uri="https://raw.github.com/pmh-only/ws/main/ws.sh"
 install_path="/usr/local/bin/ws"
 
 curl --fail --location --progress-bar --output "${install_path}" "${install_uri}"
 chmod a+rx "${install_path}"
 
 echo "ws has been installed to ${install_path}."
-echo "Run 'ws --help' to get started."%    
+echo "Please add these lines to your shell profile"
+echo "	alias \"ws\"=\". ws\""
