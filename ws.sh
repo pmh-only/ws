@@ -37,7 +37,7 @@ case $1 in
       return
     fi
 
-    if [ $# -ne 2 ]; then
+    if [ $# -lt 2 ]; then
       echo "Usage: ws c <git_remote_url> [workspace_name]"
       return
     fi
