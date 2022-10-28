@@ -56,11 +56,26 @@ case $1 in
 
     git clone $2 $WORKSPACE_PATH
   
-    echo $CONFIG_DATA | jq ".spaces += [{\"name\":\"$WORKSPACE_NAME\",\"path\":\"$WORKSPACE_PATH\"}]" > $CONFIG_PATH
-    echo "Workspace created. \"$WORKSPACE_NAME\" ~> \"$WORKSPACE_PATH\""
+    echo $CONFIG_DATA | jq ".spaces += [{\"name\":\"$WORKSPACE_NAME\",\"path\":\"$WORKSPACE_PATH\"}]|.lastcc = \"$WORKSPACE_NAME\"" > $CONFIG_PATH
+    echo "Workspace created. \"$WORKSPACE_NAME\" ~> \"$WORKSPACE_PATH\"."
+    echo "Type \"ws\" to change working directory to workspace directory."
     ;;
 
   "")
+    LAST_CC=$(echo $CONFIG_DATA | jq -r ".lastcc")
+    WORKSPACE_PATH=$(echo $CONFIG_DATA | jq -r ".spaces[] | select(.name == \"$LAST_CC\") | .path")
+
+    if [ "$LAST_CC" != "null" ]; then
+      if [ "$WORKSPACE_PATH" = "" ]; then
+        echo "\"$LAST_CC\" is invalid workspace name. exit."
+      else
+	cd $WORKSPACE_PATH
+      fi
+
+      echo $CONFIG_DATA | jq "del(.lastcc)" > $CONFIG_PATH
+      return
+    fi
+
     echo "Usage: ws c <git_remote_url>"
     echo "Usage: ws a <workspace_name>"
     echo "Usage: ws [workspace_name]"
