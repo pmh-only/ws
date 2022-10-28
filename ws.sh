@@ -64,6 +64,10 @@ case $1 in
     echo "Type \"ws\" to change working directory to workspace directory."
     ;;
 
+  l)
+    echo $CONFIG_DATA | jq -r ".spaces[] | .name  + \" ~> \" + .path"
+    ;;
+
   "")
     LAST_CC=$(echo $CONFIG_DATA | jq -r ".lastcc")
     WORKSPACE_PATH=$(echo $CONFIG_DATA | jq -r ".spaces[] | select(.name == \"$LAST_CC\") | .path")
