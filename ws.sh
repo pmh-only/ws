@@ -14,12 +14,11 @@ CONFIG_DATA=$(jq -c . "$CONFIG_PATH")
 
 case $1 in
   a)
-    if [ $# -ne 2 ]; then
-      echo "Usage: ws a <workspace_name>"
-      return
+    WORKSPACE_NAME=$2
+    if [ "$WORKSPACE_NAME" = "" ]; then
+      WORKSPACE_NAME=$(echo "${PWD##*/}")
     fi
 
-    WORKSPACE_NAME=$2
     WORKSPACE_PATH=$PWD
     WORKSPACE_EXISTS=$(echo $CONFIG_DATA | jq -r ".spaces[] | select(.name == \"$WORKSPACE_NAME\") | .path")
 
