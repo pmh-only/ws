@@ -13,6 +13,34 @@ fi
 CONFIG_DATA=$(jq -c . "$CONFIG_PATH")
 
 case $1 in
+  c)
+    if !command -v git &> /dev/null; then
+      echo "Cannot found requirement: \"git\". exit."
+      return
+    fi
+
+    if [ $# -ne 2 ]; then
+      echo "Usage: ws c <workspace_name> <git_remote_url>"
+      return
+    fi
+    
+    WORKSPACE_PATH=$(cut -d: -f2 <<< $2)
+    WORKSPACE_PATH=$(cut -d. -f1 <<< $WORKSPACE_PATH)
+    WORKSPACE_NAME=$(cut -d/ -f2 <<< $WORKSPACE_PATH)
+    WORKSPACE_PATH="$(echo $CONFIG_DATA | jq -r ".base")/$WORKSPACE_PATH"
+
+    WORKSPACE_EXISTS=$(echo $CONFIG_DATA | jq -r ".spaces[] | select(.name == \"$WORKSPACE_NAME\") | .path")
+    if [ "$WORKSPACE_EXISTS" != "" ]; then
+      echo "Workspace \"$WORKSPACE_NAME\" is already exists. exit."
+      return
+    fi
+
+    git clone $2 $WORKSPACE_PATH
+  
+    echo $CONFIG_DATA | jq ".spaces += [{\"name\":\"$WORKSPACE_NAME\",\"path\":\"$WORKSPACE_PATH\"}]" > $CONFIG_PATH
+    echo "Workspace created. \"$WORKSPACE_NAME\" ~> \"$WORKSPACE_PATH\""
+    ;;
+
   "")
     echo "Usage: ws c <git_remote_url>"
     echo "Usage: ws d [workspace_name]"
